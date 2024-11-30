@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository("movie-elastic")
+@Repository
 public interface MovieElasticsearchRepository extends ElasticsearchRepository<Movie, String> {
     @Query("{\"match_phrase\": {\"tags.name\": \"?0\"}}")
     List<Movie> findByTagsNameMatchPhrase(String name);

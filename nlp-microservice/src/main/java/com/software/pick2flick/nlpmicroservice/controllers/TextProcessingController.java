@@ -19,7 +19,6 @@ public class TextProcessingController {
     public ResponseEntity<List<String>> findKeywords(
             @Valid @RequestBody List<String> descriptions
     ) {
-        System.out.println("Пришёл сюда");
         return ResponseEntity.ok(textProcessingService.findKeywords(descriptions));
     }
 }

@@ -24,7 +24,6 @@ public class TextProcessingService {
     }
 
     public List<String> findKeywords(List<String> descriptions) {
-        System.out.println("Пришёл сюда");
         String totalDescription = String.join(". ", descriptions);
         
         Annotation document = new Annotation(totalDescription);

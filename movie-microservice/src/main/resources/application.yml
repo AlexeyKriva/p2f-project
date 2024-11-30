@@ -2,9 +2,8 @@ spring:
   application:
     name: movie-microservice
 
-  data:
-    elasticsearch:
-      cluster-nodes: ${ELASTICSEARCH_URL:localhost:9200}
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URL:localhost:9200}
 
   security:
     oauth2:

@@ -51,9 +51,7 @@ services:
     image: chalexl/p2f-auth-server:1.0
     restart: always
     depends_on:
-      config-server:
-        condition: service_healthy
-      keycloak:
+      eureka-server:
         condition: service_healthy
     ports:
       - "3334:3334"
@@ -63,13 +61,13 @@ services:
       KEYCLOAK_REALM: p2f
       KEYCLOAK_CLIENT_ID_ADMIN: admin-cli
       KEYCLOAK_CLIENT_ID_USER: auth-serv
-      KEYCLOAK_CLIENT_SECRET_USER: z6kWOtHS3pIceLIsrt9BYj0Q5vP9R6EQ
+      KEYCLOAK_CLIENT_SECRET_USER: 6e7o0JqXu4ld2dkCNHcfCSwpkAxsTFKw
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KEYCLOAK_GRANT_TYPE: password
       KEYCLOAK_REFRESH_GRANT_TYPE: refresh_token
     healthcheck:
-      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:8085" ]
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:3334" ]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -131,12 +129,10 @@ services:
       - "3332:3332"
     environment:
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
-      ELASTICSEARCH_URL: elasticsearch:9200
       AUTH_SERVER_URL: http://keycloak:8080/realms/p2f
-      ELASTICSEARCH_USERNAME: elast
-      ELASTICSEARCH_PASSWORD: password
+      ELASTICSEARCH_URL: elasticsearch:9200
     healthcheck:
-      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:3332/" ]
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:3332" ]
       interval: 10s
       retries: 5
       start_period: 30s

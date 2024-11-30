@@ -18,7 +18,7 @@ keycloak:
   realm: ${KEYCLOAK_REALM:p2f}
   client-id-admin: ${KEYCLOAK_CLIENT_ID_ADMIN:admin-cli}
   client-id-user: ${KEYCLOAK_CLIENT_ID_USER:auth-serv}
-  client-secret-user: ${KEYCLOAK_CLIENT_SECRET_USER:z6kWOtHS3pIceLIsrt9BYj0Q5vP9R6EQ}
+  client-secret-user: ${KEYCLOAK_CLIENT_SECRET_USER:6e7o0JqXu4ld2dkCNHcfCSwpkAxsTFKw}
   admin-username: ${KC_BOOTSTRAP_ADMIN_USERNAME:admin}
   admin-password: ${KC_BOOTSTRAP_ADMIN_PASSWORD:admin}
   grant-type: ${KEYCLOAK_GRANT_TYPE:password}

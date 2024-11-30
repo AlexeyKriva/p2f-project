@@ -38,7 +38,7 @@ public class ImageDescriptionService {
 
         if (isKeyWordsMode) {
             return nlpClient.findKeywords(
-                    (String) ((Jwt) authentication.getCredentials()).getTokenValue(),
+                    "Bearer " + (String) ((Jwt) authentication.getCredentials()).getTokenValue(),
                     imageDescriptions.stream()
                             .map(ImageDescription::getLabel)
                             .toList()

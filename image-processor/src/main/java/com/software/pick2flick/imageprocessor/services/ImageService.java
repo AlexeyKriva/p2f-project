@@ -57,7 +57,7 @@ public class ImageService {
 
         if (isImageClear(imageDescriptions)) {
             ResponseEntity<List<Movie>> moviesFromDb = movieClient.getFilmsByImageDescription(
-                    (String) ((Jwt) authentication.getCredentials()).getTokenValue(),
+                    "Bearer " + (String) ((Jwt) authentication.getCredentials()).getTokenValue(),
                     imageDescriptions
             );
 
