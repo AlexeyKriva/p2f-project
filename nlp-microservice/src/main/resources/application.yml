@@ -6,7 +6,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/p2f
+          issuer-uri: ${AUTH_SERVER_URL:http://localhost:8080/realms/p2f}
 
 server:
   port: 3333

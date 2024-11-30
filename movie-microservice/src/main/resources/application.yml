@@ -6,18 +6,11 @@ spring:
     elasticsearch:
       cluster-nodes: ${ELASTICSEARCH_URL:localhost:9200}
 
-  cloud:
-    openfeign:
-      client:
-        config:
-          elasticsearch-client:
-            url: https://localhost:9200/movies
-
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/p2f
+          issuer-uri: ${AUTH_SERVER_URL:http://localhost:8080/realms/p2f}
 
 eureka:
   client:
@@ -28,5 +21,5 @@ server:
   port: 3332
 
 elastic:
-  username: elast
-  password: password
+  username: ${ELASTICSEARCH_USERNAME:elast}
+  password: ${ELASTICSEARCH_PASSWORD:password}

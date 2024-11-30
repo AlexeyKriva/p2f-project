@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: bitnami/elasticsearch
+    restart: always
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+    volumes:
+      - ./elasticsearch_data:/usr/share/elasticsearch/data
+
+  eureka-server:
+    image: chalexl/p2f-config-server:1.0
+    restart: always
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:8761/eureka/" ]
+      interval: 10s
+      retries: 5
+      start_period: 15s
+      timeout: 10s
+    networks:
+      - app-network
+
+  keycloak:
+    image: keycloak/keycloak
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    command: start-dev
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:8080" ]
+      interval: 10s
+      retries: 5
+      start_period: 15s
+      timeout: 10s
+    networks:
+      - app-network
+    volumes:
+      - ./keycloak_data:/opt/keycloak/data
+
+  auth-server:
+    image: chalexl/p2f-auth-server:1.0
+    restart: always
+    depends_on:
+      config-server:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    ports:
+      - "3334:3334"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KEYCLOAK_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_REALM: p2f
+      KEYCLOAK_CLIENT_ID_ADMIN: admin-cli
+      KEYCLOAK_CLIENT_ID_USER: auth-serv
+      KEYCLOAK_CLIENT_SECRET_USER: z6kWOtHS3pIceLIsrt9BYj0Q5vP9R6EQ
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KEYCLOAK_GRANT_TYPE: password
+      KEYCLOAK_REFRESH_GRANT_TYPE: refresh_token
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:8085" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - app-network
+
+  image-processor:
+    image: chalexl/p2f-image-processor:1.0
+    restart: always
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      auth-server:
+        condition: service_healthy
+    ports:
+      - "3331:3331"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      MOVIE_URL: http://movie-microservice:3332/api/movies
+      NLP_URL: http://nlp-microservice:3333/api/keywords
+      AUTH_SERVER_URL: http://keycloak:8080/realms/p2f
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:3331" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - app-network
+
+  nlp-microservice:
+    image: chalexl/p2f-nlp-microservice:1.0
+    restart: always
+    depends_on:
+      image-processor:
+        condition: service_healthy
+    ports:
+      - "3333:3333"
+    environment:
+      AUTH_SERVER_URL: http://keycloak:8080/realms/p2f
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:3333" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - app-network
+
+  movie-microservice:
+    image: chalexl/p2f-movie-microservice:1.0
+    restart: always
+    depends_on:
+      image-processor:
+        condition: service_healthy
+    ports:
+      - "3332:3332"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      ELASTICSEARCH_URL: elasticsearch:9200
+      AUTH_SERVER_URL: http://keycloak:8080/realms/p2f
+      ELASTICSEARCH_USERNAME: elast
+      ELASTICSEARCH_PASSWORD: password
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --write-out '%{http_code}' --silent --output /dev/null http://localhost:3332/" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    volumes:
+      - /Users/aliaksei/Desktop/Modsen/rides-microservice/logs:/logs
+    networks:
+      - app-network
+
+  api-gateway:
+    image: chalexl/p2f-api-gateway:1.0
+    restart: always
+    depends_on:
+      nlp-microservice:
+        condition: service_healthy
+      movie-microservice:
+        condition: service_healthy
+    ports:
+      - "8765:8765"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
