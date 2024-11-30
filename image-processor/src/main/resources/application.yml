@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: image-processor
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          model-client:
+            url: https://api-inference.huggingface.co/models
+          movie-client:
+            url: ${MOVIE_URL:http://localhost:3332/api/movies}
+          nlp-client:
+            url: ${NLP_URL:http://localhost:3333/api/keywords}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/p2f
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+
+huggingface:
+  api:
+    key: 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
+
+server:
+  port: 3331

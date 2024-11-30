@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: movie-microservice
+
+  data:
+    elasticsearch:
+      cluster-nodes: ${ELASTICSEARCH_URL:localhost:9200}
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          elasticsearch-client:
+            url: https://localhost:9200/movies
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/p2f
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+
+server:
+  port: 3332
+
+elastic:
+  username: elast
+  password: password
