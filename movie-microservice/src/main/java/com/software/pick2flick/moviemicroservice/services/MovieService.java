@@ -61,6 +61,8 @@ public class MovieService {
             } else {
                 elasticsearchRepository.deleteById(id);
             }
+
+            return;
         }
 
         throw new MovieNotFoundException(MOVIE_NOT_FOUND_MESSAGE);

@@ -120,7 +120,7 @@ services:
       - app-network
 
   movie-microservice:
-    image: chalexl/p2f-movie-microservice:1.0
+    image: chalexl/p2f-movie-microservice:2.0
     restart: always
     depends_on:
       image-processor:
